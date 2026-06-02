@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Formulario de Configuración - Drelife</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--black:#0a0a0a;--white:#ffffff;--gray:#f7f7f5;--gray2:#f0f0ee;--border:#e8e8e6;--text:#0a0a0a;--muted:#888;--accent:#0a0a0a}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--gray);color:var(--text);padding:20px}
+.container{max-width:1000px;margin:0 auto}
+.header{background:var(--black);color:var(--white);padding:40px;border-radius:12px;margin-bottom:40px;text-align:center}
+.header h1{font-size:28px;font-weight:300;letter-spacing:-0.02em;margin-bottom:8px}
+.header p{font-size:13px;color:rgba(255,255,255,0.8)}
+.form-section{background:var(--white);border:1px solid var(--border);border-radius:12px;margin-bottom:24px;overflow:hidden}
+.section-header{background:var(--black);color:var(--white);padding:18px 24px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none}
+.section-header h2{font-size:14px;font-weight:600;letter-spacing:0.05em}
+.toggle-icon{font-size:18px;transition:transform 0.3s}
+.toggle-icon.open{transform:rotate(180deg)}
+.section-content{padding:24px;display:none}
+.section-content.open{display:block}
+.form-group{margin-bottom:20px}
+.form-group:last-child{margin-bottom:0}
+.form-label{display:block;font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.form-description{font-size:11px;color:var(--muted);margin-bottom:10px;font-style:italic}
+.form-input,.form-textarea,.form-select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;color:var(--text)}
+.form-input:focus,.form-textarea:focus,.form-select:focus{outline:none;border-color:#555;box-shadow:0 0 0 3px rgba(0,0,0,0.05)}
+.form-textarea{min-height:80px;resize:vertical}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:700px){.form-row{grid-template-columns:1fr}}
+.radio-group,.checkbox-group{display:flex;flex-direction:column;gap:10px}
+.radio-item,.checkbox-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0}
+input[type="radio"],input[type="checkbox"]{margin-top:2px;cursor:pointer;accent-color:var(--black)}
+.radio-label,.checkbox-label{cursor:pointer;font-size:13px;line-height:1.5}
+.info-box{background:var(--gray);border-left:3px solid var(--black);padding:12px 14px;border-radius:4px;margin:16px 0;font-size:12px;color:var(--muted);line-height:1.6}
+.info-box strong{color:var(--text)}
+.required{color:#c85c5c}
+.actions{display:flex;gap:12px;margin-top:32px;justify-content:center;flex-wrap:wrap}
+.btn{padding:12px 28px;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;letter-spacing:0.02em;transition:all 0.2s;font-family:inherit}
+.btn-primary{background:var(--black);color:var(--white)}
+.btn-primary:hover{opacity:0.9}
+.btn-secondary{background:var(--gray);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{background:var(--gray2)}
+.section-number{display:inline-block;width:24px;height:24px;background:var(--gray);border-radius:50%;text-align:center;line-height:24px;font-size:11px;font-weight:600;margin-right:8px;color:var(--text)}
+.progress-bar{height:2px;background:var(--gray);margin-bottom:24px;border-radius:2px}
+.progress-fill{height:100%;background:var(--black);width:0%;transition:width 0.3s}
+.success-message{background:#e3f8ef;border:1px solid #3ab464;color:#2a7a4a;padding:12px 14px;border-radius:8px;margin-bottom:20px;display:none}
+.success-message.show{display:block}
+.field-hint{font-size:10px;color:var(--muted);margin-top:4px}
+.categoria-chip{display:inline-flex;align-items:center;gap:8px;background:var(--black);color:var(--white);padding:6px 12px;border-radius:16px;font-size:12px;font-weight:500}
+.categoria-chip button{background:none;border:none;color:var(--white);cursor:pointer;font-size:14px;padding:0;width:18px;height:18px;display:flex;align-items:center;justify-content:center;transition:opacity 0.2s}
+.categoria-chip button:hover{opacity:0.8}
+</style>
+</head>
+<body>
+
+<div class="container">
+  
+  <div class="header">
+    <h1>CONFIGURACIÓN DEL PROGRAMA PRE-OWNED</h1>
+    <p>FC Barcelona Merchandising · Drelife</p>
+  </div>
+
+  <div class="progress-bar"><div class="progress-fill"></div></div>
+
+  <div class="success-message" id="successMsg">✓ Configuración guardada correctamente</div>
+
+  <form id="configForm">
+
+    <!-- 01 SETUP - INTEGRACIÓN -->
+    <div class="form-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <h2><span class="section-number">01</span>SETUP · Tipo de Integración</h2>
+        <span class="toggle-icon">▼</span>
+      </div>
+      <div class="section-content">
+        
+        <div class="form-group">
+          <label class="form-label">Plataforma de e-commerce <span class="required">*</span></label>
+          <div class="form-description">¿Dónde está tu tienda online?</div>
+          <select class="form-select" name="plataforma" required>
+            <option value="">Selecciona...</option>
+            <option value="shopify">Shopify</option>
+            <option value="woocommerce">WooCommerce</option>
+            <option value="custom">Custom/Propia</option>
+            <option value="sap">SAP/ERP</option>
+            <option value="otra">Otra</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">¿Tenéis historial de compras por cliente? <span class="required">*</span></label>
+          <div class="form-description">¿Disponible en vuestra base de datos?</div>
+          <div class="radio-group">
+            <label class="radio-item">
+              <input type="radio" name="historial" value="si" required>
+              <span class="radio-label">Sí, disponible e integrable</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="historial" value="no" required>
+              <span class="radio-label">No, entrada manual del cliente</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="historial" value="parcial" required>
+              <span class="radio-label">Parcialmente (solo ciertos clientes)</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Tipo de integración elegida <span class="required">*</span></label>
+          <div class="form-description">Puedes combinar varias opciones</div>
+          <div class="checkbox-group">
+            <label class="checkbox-item">
+              <input type="checkbox" name="integracion" value="categorias">
+              <span class="checkbox-label"><strong>Por categorías:</strong> Define qué categorías son elegibles</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="integracion" value="catalogo">
+              <span class="checkbox-label"><strong>Por catálogo:</strong> Catálogo completo integrado</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="integracion" value="historial">
+              <span class="checkbox-label"><strong>Por historial:</strong> Cliente selecciona sus compras</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Categorías incluidas en pre-owned <span class="required">*</span></label>
+          <div class="form-description">Ej: Camisetas, Sudaderas, Pantalones, Bolsos, etc.</div>
+          <div style="display:flex;gap:8px;margin-bottom:10px">
+            <input type="text" class="form-input" id="inputCategoria" placeholder="Ej: Samarreta" style="flex:1">
+            <button type="button" class="btn btn-primary" onclick="agregarCategoria()" style="padding:10px 16px;margin:0">+ Añadir</button>
+          </div>
+          <div id="categoriasChips" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;min-height:30px"></div>
+          <input type="hidden" id="categoriasValor" name="categorias" required>
+          <div class="field-hint">Pulsa Enter o haz clic en "+ Añadir" para agregar categorías</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">¿Hay referencias o colecciones excluidas?</label>
+          <div class="form-description">Si hay productos que NO quieres en pre-owned</div>
+          <input type="text" class="form-input" name="exclusiones" placeholder="Ej: Colección limitada, Replicas, Vintage pre-2020">
+          <div class="field-hint">Déjalo en blanco si no hay exclusiones</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">¿Disponéis de equipo técnico para la integración? <span class="required">*</span></label>
+          <div class="radio-group">
+            <label class="radio-item">
+              <input type="radio" name="equipo_tecnico" value="si" required>
+              <span class="radio-label">Sí, tenemos equipo disponible</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="equipo_tecnico" value="no" required>
+              <span class="radio-label">No, Drelife gestiona la integración</span>
+            </label>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 02 SETUP - ESTADOS DEL PRODUCTO -->
+    <div class="form-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <h2><span class="section-number">02</span>SETUP · Estados del Producto</h2>
+        <span class="toggle-icon">▼</span>
+      </div>
+      <div class="section-content">
+        
+        <div class="info-box">
+          <strong>Estados estándar sugeridos:</strong> Nuevo/sin uso | Muy buen estado | Buen estado | Con señales de uso
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">¿Usáis la nomenclatura estándar o la adaptáis? <span class="required">*</span></label>
+          <div class="radio-group">
+            <label class="radio-item">
+              <input type="radio" name="nomenclatura" value="estandar" required>
+              <span class="radio-label">Usamos la estándar de Drelife</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="nomenclatura" value="personalizada" required>
+              <span class="radio-label">Personalizamos para nuestra marca</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Si personalizáis, describid los estados:</label>
+          <div class="form-description">Nomenclatura y descripción que verá el cliente</div>
+          <textarea class="form-textarea" name="estados_personalizados" placeholder="Estado 1: Descripción&#10;Estado 2: Descripción&#10;Estado 3: Descripción&#10;..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Rango de crédito por estado <span class="required">*</span></label>
+          <div class="form-description">En % del PVP original o en importe fijo</div>
+          <div class="form-row">
+            <div>
+              <label class="form-label" style="margin-bottom:4px">Estado 1 (Excelente)</label>
+              <input type="text" class="form-input" name="credito_1" placeholder="Ej: 85% o 15€" required>
+            </div>
+            <div>
+              <label class="form-label" style="margin-bottom:4px">Estado 2 (Muy bueno)</label>
+              <input type="text" class="form-input" name="credito_2" placeholder="Ej: 70% o 12€" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div>
+              <label class="form-label" style="margin-bottom:4px">Estado 3 (Bueno)</label>
+              <input type="text" class="form-input" name="credito_3" placeholder="Ej: 55% o 9€" required>
+            </div>
+            <div>
+              <label class="form-label" style="margin-bottom:4px">Estado 4 (Aceptable)</label>
+              <input type="text" class="form-input" name="credito_4" placeholder="Ej: 40% o 6€" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">¿Hay un estado mínimo por debajo del que se rechaza automáticamente?</label>
+          <input type="text" class="form-input" name="rechazo_automatico" placeholder="Ej: 'Por debajo de Estado 3' o 'Menos de 5€'">
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 03 SETUP - MENSAJES AUTOMÁTICOS -->
+    <div class="form-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <h2><span class="section-number">03</span>SETUP · Mensajes Automáticos</h2>
+        <span class="toggle-icon">▼</span>
+      </div>
+      <div class="section-content">
+        
+        <div class="form-group">
+          <label class="form-label">Confirmación de solicitud - Canal <span class="required">*</span></label>
+          <div class="form-description">¿Cómo notificáis al cliente que recibisteis la solicitud?</div>
+          <div class="radio-group">
+            <label class="radio-item">
+              <input type="radio" name="canal_confirmacion" value="email" required>
+              <span class="radio-label">Email</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="canal_confirmacion" value="push" required>
+              <span class="radio-label">Push (aplicación)</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="canal_confirmacion" value="ambos" required>
+              <span class="radio-label">Ambos</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Tono de mensajes <span class="required">*</span></label>
+          <div class="form-description">¿Cómo queremos comunicarnos con el cliente?</div>
+          <div class="radio-group">
+            <label class="radio-item">
+              <input type="radio" name="tono" value="formal" required>
+              <span class="radio-label">Formal y profesional</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="tono" value="cercano" required>
+              <span class="radio-label">Cercano y amigable</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="tono" value="sport" required>
+              <span class="radio-label">Deportivo (según marca FC Barcelona)</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Firma de marca para los mensajes</label>
+          <input type="text" class="form-input" name="firma" placeholder="Ej: 'El equipo de FC Barcelona' o 'Barça Sostenible'">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">¿Queréis incluir incentivos en el mensaje de confirmación de crédito?</label>
+          <div class="form-description">Ej: "10% extra si compras en 7 días"</div>
+          <textarea class="form-textarea" name="incentivos" placeholder="Dejad en blanco si no hay incentivos..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Mensaje para solicitudes rechazadas <span class="required">*</span></label>
+          <div class="form-description">¿Qué decimos si rechazamos un producto?</div>
+          <textarea class="form-textarea" name="mensaje_rechazo" placeholder="Ej: 'Lamentamos que no podamos aceptar esta prenda. Te invitamos a intentarlo con otro artículo...'" required></textarea>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 04 SETUP - LOGÍSTICA -->
+    <div class="form-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <h2><span class="section-number">04</span>SETUP · Opciones Logísticas</h2>
+        <span class="toggle-icon">▼</span>
+      </div>
+      <div class="section-content">
+        
+        <div class="form-group">
+          <label class="form-label">¿Qué opciones logísticas activáis? <span class="required">*</span></label>
+          <div class="form-description">Puedes activar una, dos o las tres</div>
+          <div class="checkbox-group">
+            <label class="checkbox-item">
+              <input type="checkbox" name="logistica" value="tienda" required>
+              <span class="checkbox-label"><strong>Entrega en tienda:</strong> Cliente lleva el producto a un punto físico</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="logistica" value="pickup" required>
+              <span class="checkbox-label"><strong>Pickup en domicilio:</strong> Recogemos nosotros del cliente</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="logistica" value="dropoff" required>
+              <span class="checkbox-label"><strong>Drop-off en punto:</strong> Cliente deja en punto de conveniencia</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Operador logístico principal <span class="required">*</span></label>
+          <div class="form-description">¿Con quién trabajáis actualmente?</div>
+          <input type="text" class="form-input" name="operador" placeholder="Ej: Correos Express, MRW, DHL" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">¿Quién asume el coste del envío? <span class="required">*</span></label>
+          <div class="radio-group">
+            <label class="radio-item">
+              <input type="radio" name="coste_envio" value="marca" required>
+              <span class="radio-label">FC Barcelona asume el coste (incluido en el reembolso)</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="coste_envio" value="cliente" required>
+              <span class="radio-label">El cliente asume el coste (se descuenta del crédito)</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="coste_envio" value="ambos" required>
+              <span class="radio-label">Depende de la opción elegida</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">¿Tenéis tiendas físicas habilitadas para recibir entregas?</label>
+          <div class="form-description">Si activasteis "Entrega en tienda"</div>
+          <textarea class="form-textarea" name="tiendas" placeholder="Listado de tiendas, direcciones y horarios disponibles"></textarea>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 05 SETUP - VOUCHER / CRÉDITO -->
+    <div class="form-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <h2><span class="section-number">05</span>SETUP · Voucher / Crédito</h2>
+        <span class="toggle-icon">▼</span>
+      </div>
+      <div class="section-content">
+        
+        <div class="form-group">
+          <label class="form-label">Tipo de compensación al cliente <span class="required">*</span></label>
+          <div class="form-description">¿Cómo devolvemos el valor al cliente?</div>
+          <div class="radio-group">
+            <label class="radio-item">
+              <input type="radio" name="tipo_credito" value="tienda" required>
+              <span class="radio-label"><strong>Crédito en tienda:</strong> Código para próxima compra (más recompra)</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="tipo_credito" value="transferencia" required>
+              <span class="radio-label"><strong>Pago directo:</strong> Transferencia bancaria (menos fricción para cliente)</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="tipo_credito" value="ambos" required>
+              <span class="radio-label"><strong>A elección del cliente:</strong> Elige crédito o transferencia (máx. flexibilidad)</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Validez del crédito en tienda <span class="required">*</span></label>
+          <div class="form-description">¿Cuánto tiempo es válido el crédito?</div>
+          <input type="text" class="form-input" name="validez_credito" placeholder="Ej: 12 meses, 6 meses, 24 meses" required>
+          <div class="field-hint">Recomendamos mínimo 12 meses</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">¿Hay mínimo de compra para usar el crédito?</label>
+          <input type="text" class="form-input" name="minimo_compra" placeholder="Ej: Sin mínimo, 20€ mínimo">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">¿En qué categorías es aplicable el crédito?</label>
+          <div class="form-description">¿En toda la tienda o solo en algunas categorías?</div>
+          <textarea class="form-textarea" name="categorias_credito" placeholder="Ej: Todas las categorías, o 'Solo ropa deportiva' o 'Excluye outlet'"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">¿Es acumulable con otras promociones?</label>
+          <div class="radio-group">
+            <label class="radio-item">
+              <input type="radio" name="acumulable" value="si">
+              <span class="radio-label">Sí, se acumula con descuentos y promociones</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="acumulable" value="no">
+              <span class="radio-label">No, no se puede combinar con otras ofertas</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">¿Queréis añadir bonificación al crédito en tienda?</label>
+          <div class="form-description">Ej: 10% extra si elige crédito en lugar de transferencia</div>
+          <input type="text" class="form-input" name="bonificacion" placeholder="Ej: 10% extra, Sin bonificación">
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 06 SETUP - DECISIONES OPERACIONALES -->
+    <div class="form-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <h2><span class="section-number">06</span>SETUP · Decisiones Operacionales</h2>
+        <span class="toggle-icon">▼</span>
+      </div>
+      <div class="section-content">
+        
+        <div class="form-group">
+          <label class="form-label">Antigüedad máxima de producto aceptada <span class="required">*</span></label>
+          <div class="form-description">¿Cuántos años máximo puede tener la prenda?</div>
+          <input type="text" class="form-input" name="antiguedad_maxima" placeholder="Ej: 3 años, 5 años, Sin límite" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Precio mínimo de crédito viable <span class="required">*</span></label>
+          <div class="form-description">Por debajo, la solicitud se rechaza por no ser rentable</div>
+          <input type="text" class="form-input" name="precio_minimo" placeholder="Ej: 5€, 10€" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Responsable de aprobación de solicitudes <span class="required">*</span></label>
+          <div class="form-description">¿Quién da el visto bueno final?</div>
+          <input type="text" class="form-input" name="responsable_aprobacion" placeholder="Nombre, cargo, email" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Nivel de reacondicionamiento <span class="required">*</span></label>
+          <div class="form-description">¿Qué tipo de preparación hacemos antes de revender?</div>
+          <div class="radio-group">
+            <label class="radio-item">
+              <input type="radio" name="reacondicionamiento" value="basico" required>
+              <span class="radio-label"><strong>Básico:</strong> Solo limpieza simple</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="reacondicionamiento" value="medio" required>
+              <span class="radio-label"><strong>Intermedio:</strong> Limpieza + pequeñas reparaciones estéticas</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="reacondicionamiento" value="completo" required>
+              <span class="radio-label"><strong>Completo:</strong> Limpieza + reparaciones + sustitución accesorios</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">¿Quién asume el coste del reacondicionamiento? <span class="required">*</span></label>
+          <div class="radio-group">
+            <label class="radio-item">
+              <input type="radio" name="coste_reacondicionamiento" value="marca" required>
+              <span class="radio-label">FC Barcelona asume el coste (incluido en operativa)</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="coste_reacondicionamiento" value="descuento" required>
+              <span class="radio-label">Se descuenta del crédito al cliente</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Estrategia de pricing para el catálogo <span class="required">*</span></label>
+          <div class="form-description">¿Cómo fijáis el precio de venta de los productos recuperados?</div>
+          <div class="radio-group">
+            <label class="radio-item">
+              <input type="radio" name="pricing" value="manual" required>
+              <span class="radio-label"><strong>Manual:</strong> FC Barcelona fija precio por producto</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="pricing" value="sugerido" required>
+              <span class="radio-label"><strong>Precio sugerido:</strong> Sistema sugiere, vosotros aprobáis</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="pricing" value="automatico" required>
+              <span class="radio-label"><strong>Automático:</strong> Reglas por categoría y estado</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">¿Incluir autenticación especializada?</label>
+          <div class="form-description">Para categorías de alto valor o riesgo de falsificación</div>
+          <textarea class="form-textarea" name="autenticacion" placeholder="Ej: 'Sí, para bolsos premium' o 'No, con verificación básica'"></textarea>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 07 PREVALIDACIÓN Y RECHAZO -->
+    <div class="form-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <h2><span class="section-number">07</span>PREVALIDACIÓN · Gestión de Rechazos</h2>
+        <span class="toggle-icon">▼</span>
+      </div>
+      <div class="section-content">
+        
+        <div class="form-group">
+          <label class="form-label">¿Qué ocurre con productos rechazados en prevalidación? <span class="required">*</span></label>
+          <div class="form-description">El cliente no envía nada, solo se notifica</div>
+          <div class="radio-group">
+            <label class="radio-item">
+              <input type="radio" name="gestion_rechazo_prevalidacion" value="notificacion" required>
+              <span class="radio-label">Solo notificamos que no es aceptable</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="gestion_rechazo_prevalidacion" value="oferta" required>
+              <span class="radio-label">Le ofrecemos intentarlo con otro producto</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="gestion_rechazo_prevalidacion" value="futuro" required>
+              <span class="radio-label">Sugerimos reintentar en próxima temporada</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">¿Qué ocurre si el cliente rechaza el ajuste de crédito? <span class="required">*</span></label>
+          <div class="form-description">Si el estado real es peor del declarado y baja el crédito</div>
+          <div class="radio-group">
+            <label class="radio-item">
+              <input type="radio" name="gestion_rechazo_ajuste" value="devolvemos" required>
+              <span class="radio-label">Devolvemos el producto sin coste al cliente</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="gestion_rechazo_ajuste" value="donacion" required>
+              <span class="radio-label">Donamos el producto a una ONG</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="gestion_rechazo_ajuste" value="inventario" required>
+              <span class="radio-label">Lo mantenemos en inventario para decidir después</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">¿Queremos notificación de casos en revisión manual?</label>
+          <div class="radio-group">
+            <label class="radio-item">
+              <input type="radio" name="notificacion_revision" value="si">
+              <span class="radio-label">Sí, avisadnos de casos ambiguos</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="notificacion_revision" value="no">
+              <span class="radio-label">No, decidid vosotros automáticamente</span>
+            </label>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 08 APROBACIÓN Y PUBLICACIÓN -->
+    <div class="form-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <h2><span class="section-number">08</span>CATÁLOGO · Aprobación y Publicación</h2>
+        <span class="toggle-icon">▼</span>
+      </div>
+      <div class="section-content">
+        
+        <div class="form-group">
+          <label class="form-label">Responsable de aprobación de publicación <span class="required">*</span></label>
+          <div class="form-description">¿Quién decide qué productos se publican?</div>
+          <input type="text" class="form-input" name="responsable_publicacion" placeholder="Nombre, cargo, email" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">¿Aprobáis producto a producto o en lote? <span class="required">*</span></label>
+          <div class="radio-group">
+            <label class="radio-item">
+              <input type="radio" name="aprobacion_tipo" value="individual" required>
+              <span class="radio-label">Producto a producto (máx. control, más tiempo)</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="aprobacion_tipo" value="lote" required>
+              <span class="radio-label">En lotes (más rápido, menos control)</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="aprobacion_tipo" value="automatico" required>
+              <span class="radio-label">Automático con reglas (sin intervención manual)</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">¿Hay criterios por los que NO publicaríais un producto?</label>
+          <div class="form-description">Aunque esté validado y en buen estado</div>
+          <textarea class="form-textarea" name="criterios_no_publicacion" placeholder="Ej: Exceso de inventario, Bajo margen previsto, Aspecto no adecuado para marca"></textarea>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ACCIONES -->
+    <div style="margin-top:40px;">
+      <div class="actions">
+        <button type="button" class="btn btn-secondary" onclick="limpiarFormulario()">Limpiar formulario</button>
+        <button type="button" class="btn btn-secondary" onclick="descargarJSON()">📥 Descargar JSON</button>
+        <button type="button" class="btn btn-secondary" onclick="exportarHTML()">💾 Guardar HTML</button>
+        <button type="submit" class="btn btn-primary">✓ Guardar configuración</button>
+      </div>
+    </div>
+
+  </form>
+
+</div>
+
+<script>
+const form = document.getElementById('configForm');
+
+function toggleSection(header) {
+  const content = header.nextElementSibling;
+  const icon = header.querySelector('.toggle-icon');
+  
+  content.classList.toggle('open');
+  icon.classList.toggle('open');
+  
+  updateProgress();
+}
+
+function updateProgress() {
+  const totalSections = document.querySelectorAll('.form-section').length;
+  const openSections = document.querySelectorAll('.section-content.open').length;
+  const progress = (openSections / totalSections) * 100;
+  
+  document.querySelector('.progress-fill').style.width = progress + '%';
+}
+
+function limpiarFormulario() {
+  if (confirm('¿Estás seguro de que quieres limpiar todo el formulario?')) {
+    form.reset();
+    document.querySelectorAll('.section-content').forEach(el => el.classList.remove('open'));
+    document.querySelectorAll('.toggle-icon').forEach(el => el.classList.remove('open'));
+    updateProgress();
+  }
+}
+
+function descargarJSON() {
+  const formData = new FormData(form);
+  const data = {};
+  
+  formData.forEach((value, key) => {
+    if (key === 'integracion' || key === 'logistica') {
+      if (!data[key]) data[key] = [];
+      data[key].push(value);
+    } else {
+      data[key] = value;
+    }
+  });
+  
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `FC_Barcelona_Configuracion_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function exportarHTML() {
+  const htmlCompleto = document.documentElement.outerHTML;
+  const blob = new Blob([htmlCompleto], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `FC_Barcelona_Configuracion_${new Date().toISOString().slice(0,10)}.html`;
+  a.click();
+  URL.revokeObjectURL(url);
+  
+  // Mostrar mensaje de éxito
+  const successMsg = document.getElementById('successMsg');
+  successMsg.textContent = '✓ HTML guardado correctamente';
+  successMsg.classList.add('show');
+  setTimeout(() => successMsg.classList.remove('show'), 3000);
+}
+
+form.addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  // Validar que hay al menos una opción seleccionada en checkboxes
+  const integraciones = document.querySelectorAll('input[name="integracion"]:checked').length;
+  const logisticas = document.querySelectorAll('input[name="logistica"]:checked').length;
+  
+  if (integraciones === 0) {
+    alert('Por favor, selecciona al menos un tipo de integración');
+    return;
+  }
+  
+  if (logisticas === 0) {
+    alert('Por favor, selecciona al menos una opción logística');
+    return;
+  }
+  
+  // Mostrar mensaje de éxito
+  const successMsg = document.getElementById('successMsg');
+  successMsg.classList.add('show');
+  setTimeout(() => successMsg.classList.remove('show'), 3000);
+  
+  // Descargar automáticamente
+  descargarJSON();
+});
+
+// Expandir primer formulario por defecto
+document.querySelector('.section-header').click();
+
+// Sistema de chips para categorías
+let categorias = [];
+
+function agregarCategoria() {
+  const input = document.getElementById('inputCategoria');
+  const valor = input.value.trim();
+  
+  if (!valor) {
+    alert('Por favor, ingresa una categoría');
+    return;
+  }
+  
+  if (categorias.includes(valor)) {
+    alert('Esta categoría ya está añadida');
+    input.value = '';
+    return;
+  }
+  
+  categorias.push(valor);
+  actualizarChips();
+  input.value = '';
+  input.focus();
+}
+
+function eliminarCategoria(index) {
+  categorias.splice(index, 1);
+  actualizarChips();
+}
+
+function actualizarChips() {
+  const container = document.getElementById('categoriasChips');
+  const input = document.getElementById('categoriasValor');
+  
+  container.innerHTML = '';
+  
+  categorias.forEach((cat, index) => {
+    const chip = document.createElement('div');
+    chip.className = 'categoria-chip';
+    chip.innerHTML = `
+      ${cat}
+      <button type="button" onclick="eliminarCategoria(${index})">×</button>
+    `;
+    container.appendChild(chip);
+  });
+  
+  input.value = categorias.join(', ');
+}
+
+// Permitir Enter en el input de categorías
+document.addEventListener('keypress', function(e) {
+  if (e.key === 'Enter' && e.target.id === 'inputCategoria') {
+    e.preventDefault();
+    agregarCategoria();
+  }
+});
+</script>
+
+</body>
+</html>
